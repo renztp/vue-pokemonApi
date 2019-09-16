@@ -1,10 +1,11 @@
 <template>
-  <form @submit.prevent="updateSearch()" class="poke-search">
+  <form class="poke-search">
     <input
       class="poke-search__search"
       type="text"
       v-model="currSearchVal"
       placeholder="Enter keyword..."
+      v-on:input="updateSearch()"
     />
     <!-- Current Input value: {{ currSearchVal }} -->
   </form>

@@ -11,9 +11,11 @@
   "homepage": "https://renzpulvira.github.io/vue-pokemonApi/",
   "dependencies": {
     "axios": "^0.19.0",
+    "chart.js": "^2.8.0",
     "core-js": "^2.6.5",
     "gh-pages": "^2.1.1",
     "vue": "^2.6.10",
+    "vue-chartjs": "^3.4.2",
     "vue-router": "^3.0.3"
   },
   "devDependencies": {

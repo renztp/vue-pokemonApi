@@ -1,5 +1,6 @@
 <template>
   <div class="pokemon__item">
+    <!-- {{ pokeId }} -->
     <span v-if="(pokemonData.id) < 10" class="pokemon__item__number">#00{{pokemonData.id}}</span>
     <span v-if="(pokemonData.id) >= 10" class="pokemon__item__number">#0{{pokemonData.id}}</span>
     <span v-if="(pokemonData.id) > 99">#{{pokemonData.id}}</span>
@@ -24,23 +25,15 @@
 </template>
 
 <script>
+import { Bar } from "vue-chartjs";
+
 export default {
+  extends: Bar,
   name: "Pokemon",
   props: {
     pokemonData: Object,
-    // pokemonId: Number,
-    // pokemonName: Object,
-    // pokemonStats: Array,
-    pokemonStatsLabel: Array
-    // pokemonOtherData: Array,
-    // pokemonSpecies: Array
-  },
-  data: () => {
-    return {
-      barAnimate: {
-        from: {}
-      }
-    };
+    pokemonStatsLabel: Array,
+    pokeId: Number
   }
 };
 </script>
@@ -75,6 +68,13 @@ $palette-shadow: #777;
   /* background: #45f145; */
   box-shadow: 0px 0px 31px -3px #d6d6d6;
   background: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: 0px 17px 31px -3px #afafaf;
+  }
 
   & > span {
     position: absolute;
