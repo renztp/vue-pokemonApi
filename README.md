@@ -1,4 +1,8 @@
 # vue-pokeapi
+A Simple Pokedex App using Pokemon API to fetch data.
+
+Technology Used:
+Vuejs, Axios.
 
 ## Project setup
 ```
@@ -27,4 +31,3 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
-# vue-pokemonApi
