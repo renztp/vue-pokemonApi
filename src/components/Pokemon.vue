@@ -39,25 +39,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$palette-fighting: #c32;
-$palette-flying: #bbf;
-$palette-poison: #a4a;
-$palette-ground: #ec7;
-$palette-rock: #ca4;
-$palette-bug: #cd6;
-$palette-ghost: #86a;
-$palette-steel: #79a;
-$palette-fire: #f83;
-$palette-water: #79f;
-$palette-grass: #3c3;
-$palette-electric: #ca5;
-$palette-psychic: #f38;
-$palette-ice: #aee;
-$palette-dragon: #85f;
-$palette-dark: #554;
-$palette-fairy: #fae;
-$palette-unknown: #666;
-$palette-shadow: #777;
 .pokemon__item {
   margin-bottom: 30px;
   flex: 0 45%;

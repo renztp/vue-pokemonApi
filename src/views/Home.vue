@@ -7,12 +7,17 @@
         :key="i"
         v-bind:pokemonData="pokemon"
         v-bind:pokemonStatsLabel="pokemonData.stats_label"
-        @click.native="modalOpened = true"
+        @click.native="processPokemonInfo(pokemon.id)"
         v-bind:pokeId="pokemon.id"
       />
     </ul>
-    <div v-if="modalOpened">
-      <PokemonSingle v-bind:isOpen="modalOpened" v-on:toggleClose="emitClose($event)" />
+    <div v-if="modalOpened && pokemonData.data_loaded && misc_id">
+      <PokemonSingle
+        v-bind:isOpen="modalOpened"
+        v-on:toggleClose="emitClose($event)"
+        v-bind:pokemonId="misc_id"
+        v-bind:pokemonInfo="pokemonData"
+      />
     </div>
   </div>
 </template>
@@ -41,7 +46,8 @@ export default {
         limit: 12,
         data_loaded: false,
         stats_loaded: false
-      }
+      },
+      misc_id: null
     };
   },
   methods: {
@@ -50,6 +56,10 @@ export default {
     },
     emitClose: function(closedModal) {
       this.modalOpened = closedModal;
+    },
+    processPokemonInfo: function(pokeId) {
+      this.modalOpened = true;
+      this.misc_id = pokeId;
     }
   },
   computed: {
@@ -91,6 +101,8 @@ export default {
               pokemon_name: dataRes.data.name,
               species: speciesRes.data.genera[2].genus,
               habitat: speciesRes.data.habitat.name,
+              color: speciesRes.data.color.name,
+              intro: speciesRes.data.flavor_text_entries,
               pokemon_stats: dataRes.data.stats,
               evolution_chain: evoRes.data.chain.evolves_to[0]
             });

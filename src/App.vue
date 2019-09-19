@@ -15,6 +15,7 @@ export default {
 </script>
 
 <style lang="scss">
+@import "./assets/normalize.css";
 @font-face {
   font-family: "Roboto";
   src: url("./assets/fonts/roboto-regular.ttf") format("ttf"),
