@@ -19,6 +19,7 @@
         v-bind:pokemonInfo="pokemonData"
       />
     </div>
+    <button class="loadmore-pokemon" @click="loadMore()">Load more pokemon</button>
   </div>
 </template>
 
@@ -60,6 +61,52 @@ export default {
     processPokemonInfo: function(pokeId) {
       this.modalOpened = true;
       this.misc_id = pokeId;
+    },
+    loadMore: async function() {
+      let currLimit = this.pokemonData.limit;
+      const config = {
+        headers: {
+          "Content-type": "application/json"
+        }
+      };
+      for (
+        var callIter = this.pokemonData.limit + 1;
+        callIter <= this.pokemonData.limit + 12;
+        callIter++
+      ) {
+        axios
+          .all([
+            await axios.get(
+              `https://pokeapi.co/api/v2/pokemon/${callIter}`,
+              config
+            ),
+            await axios.get(
+              `https://pokeapi.co/api/v2/pokemon-species/${callIter}`,
+              config
+            ),
+            await axios.get(
+              `https://pokeapi.co/api/v2/evolution-chain/${callIter}`,
+              config
+            )
+          ])
+          .then(
+            axios.spread((dataRes, speciesRes, evoRes) => {
+              this.pokemonData.info.push({
+                id: dataRes.data.id,
+                pokemon_name: dataRes.data.name,
+                species: speciesRes.data.genera[2].genus,
+                habitat: speciesRes.data.habitat.name,
+                color: speciesRes.data.color.name,
+                intro: speciesRes.data.flavor_text_entries,
+                pokemon_stats: dataRes.data.stats,
+                evolution_chain: evoRes.data.chain.evolves_to[0]
+              });
+            })
+          );
+      }
+
+      this.pokemonData.limit += 12;
+      console.log(`Current Limit: ${this.pokemonData.limit}`);
     }
   },
   computed: {
@@ -120,7 +167,7 @@ export default {
 .home {
   width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 0 auto 30px;
 }
 
 .opened-modal {
@@ -145,6 +192,20 @@ export default {
     flex-wrap: wrap;
     justify-content: space-between;
   }
+}
+
+.loadmore-pokemon {
+  border: 0;
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  text-align: center;
+  padding: 15px 0;
+  cursor: pointer;
+  outline: 0;
+  background: #cd5241;
+  color: white;
+  border-radius: 10px;
 }
 
 @media screen and (max-width: 425px) {
