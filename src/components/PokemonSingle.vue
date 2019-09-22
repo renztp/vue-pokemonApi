@@ -54,7 +54,7 @@ export default {
       dataCollection: null,
       chartOptions: null
     };
-  },
+  }, 
   computed: {
     dataLabels: function() {
       return this.pokemonInfo.stats_label.map(label => label);
