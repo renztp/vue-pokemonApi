@@ -19,7 +19,13 @@
         v-bind:pokemonInfo="pokemonData"
       />
     </div>
-    <button class="loadmore-pokemon" @click="loadMore()">Load more pokemon</button>
+    <div class="loadmore-container">
+      <button
+        class="loadmore-pokemon"
+        @click="loadMore()"
+        v-if="pokemonData.data_loaded != false"
+      >Load more pokemon</button>
+    </div>
   </div>
 </template>
 
@@ -63,7 +69,6 @@ export default {
       this.misc_id = pokeId;
     },
     loadMore: async function() {
-      let currLimit = this.pokemonData.limit;
       const config = {
         headers: {
           "Content-type": "application/json"
@@ -90,7 +95,7 @@ export default {
             )
           ])
           .then(
-            axios.spread((dataRes, speciesRes, evoRes) => {
+            await axios.spread((dataRes, speciesRes, evoRes) => {
               this.pokemonData.info.push({
                 id: dataRes.data.id,
                 pokemon_name: dataRes.data.name,
@@ -101,15 +106,25 @@ export default {
                 pokemon_stats: dataRes.data.stats,
                 evolution_chain: evoRes.data.chain.evolves_to[0]
               });
+              console.log("loading...");
             })
           );
+        // .then(() => {
+        //   console.log(
+        //     this.pokemonData.info.filter(byId => {
+        //       let arr = byId.id;
+        //     })
+        //   );
+        // });
       }
 
       this.pokemonData.limit += 12;
-      console.log(`Current Limit: ${this.pokemonData.limit}`);
+      console.log("LOADED");
+      // console.log(`Current Limit: ${this.pokemonData.limit}`);
     }
   },
   computed: {
+    // TODO: Add more filters.
     filterPokemon: function() {
       if (this.pokemonData.pokemonSearch.length > 0) {
         return this.pokemonData.info.filter(byName => {
@@ -136,10 +151,7 @@ export default {
             `https://pokeapi.co/api/v2/pokemon-species/${iter}`,
             config
           ),
-          await axios.get(
-            `https://pokeapi.co/api/v2/evolution-chain/${iter}`,
-            config
-          )
+          axios.get(`https://pokeapi.co/api/v2/evolution-chain/${iter}`, config)
         ])
         .then(
           axios.spread((dataRes, speciesRes, evoRes) => {
@@ -194,6 +206,10 @@ export default {
   }
 }
 
+.loadmore-container {
+  box-sizing: border-box;
+}
+
 .loadmore-pokemon {
   border: 0;
   display: block;
@@ -213,6 +229,10 @@ export default {
     &__container {
       padding: 0 15px;
     }
+  }
+
+  .loadmore-container {
+    padding: 0 15px;
   }
 }
 </style>

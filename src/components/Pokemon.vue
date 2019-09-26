@@ -2,7 +2,10 @@
   <div class="pokemon__item">
     <!-- {{ pokeId }} -->
     <span v-if="(pokemonData.id) < 10" class="pokemon__item__number">#00{{pokemonData.id}}</span>
-    <span v-if="(pokemonData.id) >= 10" class="pokemon__item__number">#0{{pokemonData.id}}</span>
+    <span
+      v-if="(pokemonData.id) >= 10 && (pokemonData.id) <= 99"
+      class="pokemon__item__number"
+    >#0{{pokemonData.id}}</span>
     <span v-if="(pokemonData.id) > 99">#{{pokemonData.id}}</span>
     <div class="pokemon__item__image">
       <img

@@ -70,4 +70,12 @@ export default {
     }
   }
 }
+
+@media screen and (max-width: 425px) {
+  .about {
+    box-sizing: border-box;
+    padding: 0 15px;
+    margin: 0 0 30px;
+  }
+}
 </style>

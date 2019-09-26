@@ -54,7 +54,7 @@ export default {
       dataCollection: null,
       chartOptions: null
     };
-  }, 
+  },
   computed: {
     dataLabels: function() {
       return this.pokemonInfo.stats_label.map(label => label);
@@ -114,12 +114,11 @@ export default {
       };
     }
   },
-  mounted: function() { 
+  mounted: function() {
     this.fillData();
   }
 };
 </script>
-
 
 <style lang="scss" scoped>
 .pokemon-modal {
@@ -236,6 +235,25 @@ export default {
           padding: 0;
         }
       }
+    }
+  }
+}
+
+@media screen and (max-width: 425px) {
+  .pokemon-modal {
+    width: 100%;
+    height: 100%;
+    padding-top: 0;
+
+    &__close {
+      top: 25px;
+      right: 10px;
+      z-index: 999;
+    }
+
+    &__base-info {
+      height: 110%;
+      overflow-y: scroll;
     }
   }
 }
