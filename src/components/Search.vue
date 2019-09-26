@@ -53,6 +53,10 @@ export default {
   .poke-search {
     box-sizing: border-box;
     padding: 0 15px;
+
+    &__search {
+      margin-bottom: 15px;
+    }
   }
 }
 </style>

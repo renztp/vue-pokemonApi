@@ -1,6 +1,7 @@
 <template>
   <div class="home" v-bind:class="{ 'opened-modal': modalOpened }">
     <Search v-on:updateSearch="emitSearch($event)" />
+    <!-- <FilterCompo v-if="pokemonData.data_loaded && pokemonData.stats_loaded" /> -->
     <ul class="pokemon__container" v-if="pokemonData.data_loaded && pokemonData.stats_loaded">
       <Pokemon
         v-for="(pokemon, i) in filterPokemon"
@@ -35,13 +36,15 @@ import axios from "axios";
 import Pokemon from "@/components/Pokemon.vue";
 import Search from "@/components/Search.vue";
 import PokemonSingle from "@/components/PokemonSingle.vue";
+import FilterCompo from "@/components/Filter.vue";
 
 export default {
   name: "home",
   components: {
     Pokemon,
     Search,
-    PokemonSingle
+    PokemonSingle,
+    FilterCompo
   },
   data() {
     return {

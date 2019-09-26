@@ -152,6 +152,12 @@ export default {
 @media screen and (max-width: 425px) {
   .pokemon__item {
     flex: 0 100%;
+    margin-bottom: 15px;
+
+    &:hover {
+      transform: unset;
+      box-shadow: 0px 17px 31px -3px #afafaf;
+    }
   }
 }
 </style>
