@@ -16,7 +16,7 @@
       </div>
       <div class="base-info__intro">
         <h4>Intro</h4>
-        <p>{{ filterIntro[0].flavor_text }}</p>
+        <p>{{ pokemonInfo.info[pokemonId-1].intro.flavor_text }}</p>
       </div>
       <div v-if="dataCollection" class="base-info__stats">
         <div class="base-info__stats-container">

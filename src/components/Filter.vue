@@ -5,7 +5,16 @@
         <carousel :perPageCustom="[[320, 3],[425,6],[768, 7],[1024, 8]]" :paginationEnabled="false">
           <slide v-for="(type, i) in types" :key="i">
             <div class="filter__type-container">
-              <button v-bind:style="{ backgroundColor: typeColor[i] }">{{ type }}</button>
+              <button
+                v-if="type == 'normal'"
+                @click="filterType('normal')"
+                v-bind:style="{ backgroundColor: typeColor[i] }"
+              >All</button>
+              <button
+                @click="filterType(type)"
+                v-bind:style="{ backgroundColor: typeColor[i] }"
+                v-else
+              >{{ type }}</button>
             </div>
           </slide>
         </carousel>
@@ -27,6 +36,7 @@ export default {
     return {
       types: [],
       typesLoaded: false,
+      pokeType: "Normal",
       typeColor: [
         "#ddd",
         "#c32",
@@ -51,11 +61,16 @@ export default {
       ]
     };
   },
-  async created() {
+  methods: {
+    filterType: function(type) {
+      this.pokeType = type;
+      this.$emit("filterType", this.pokeType);
+    }
+  },
+  async mounted() {
     this.typesLoaded = false;
     await axios.get(`https://pokeapi.co/api/v2/type/`).then(res => {
       this.types = res.data.results.map(type => type.name);
-      console.log(this.types);
       this.typesLoaded = true;
     });
   }

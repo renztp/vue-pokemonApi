@@ -1,7 +1,12 @@
 <template>
   <div class="home" v-bind:class="{ 'opened-modal': modalOpened }">
-    <Search v-on:updateSearch="emitSearch($event)" />
-    <!-- <FilterCompo v-if="pokemonData.data_loaded && pokemonData.stats_loaded" /> -->
+    <div class="filter__wrapper">
+      <Search v-on:updateSearch="emitSearch($event)" />
+      <FilterCompo
+        v-on:filterType="emitFiltertype($event)"
+        v-if="pokemonData.data_loaded && pokemonData.stats_loaded"
+      />
+    </div>
     <ul class="pokemon__container" v-if="pokemonData.data_loaded && pokemonData.stats_loaded">
       <Pokemon
         v-for="(pokemon, i) in filterPokemon"
@@ -21,11 +26,8 @@
       />
     </div>
     <div class="loadmore-container">
-      <button
-        class="loadmore-pokemon"
-        @click="loadMore()"
-        v-if="pokemonData.data_loaded != false"
-      >Load more pokemon</button>
+      <button class="loadmore-pokemon" @click="loadMore()" v-if="!is_loading">Load more pokemon</button>
+      <button class="loadmore-pokemon btn-disabled" v-else>Loading...</button>
     </div>
   </div>
 </template>
@@ -49,6 +51,7 @@ export default {
   data() {
     return {
       modalOpened: false,
+      currFilter: "normal",
       pokemonData: {
         pokemonSearch: "",
         info: [],
@@ -57,12 +60,16 @@ export default {
         data_loaded: false,
         stats_loaded: false
       },
+      is_loading: false,
       misc_id: null
     };
   },
   methods: {
     emitSearch: function(updatedSearch) {
       this.pokemonData.pokemonSearch = updatedSearch.toLowerCase();
+    },
+    emitFiltertype: function(theFilter) {
+      this.currFilter = theFilter;
     },
     emitClose: function(closedModal) {
       this.modalOpened = closedModal;
@@ -99,31 +106,31 @@ export default {
           ])
           .then(
             await axios.spread((dataRes, speciesRes, evoRes) => {
+              let typeHolder = dataRes.data.types.map(
+                gotoType => gotoType.type
+              );
+              let pokeIntro = speciesRes.data.flavor_text_entries.filter(n => {
+                return n.language.name.match("en");
+              });
               this.pokemonData.info.push({
                 id: dataRes.data.id,
                 pokemon_name: dataRes.data.name,
+                types: typeHolder.map(getType => getType.name),
                 species: speciesRes.data.genera[2].genus,
                 habitat: speciesRes.data.habitat.name,
                 color: speciesRes.data.color.name,
-                intro: speciesRes.data.flavor_text_entries,
+                intro: pokeIntro[0],
                 pokemon_stats: dataRes.data.stats,
                 evolution_chain: evoRes.data.chain.evolves_to[0]
               });
-              console.log("loading...");
             })
           );
-        // .then(() => {
-        //   console.log(
-        //     this.pokemonData.info.filter(byId => {
-        //       let arr = byId.id;
-        //     })
-        //   );
-        // });
+        this.is_loading = true;
       }
 
       this.pokemonData.limit += 12;
-      console.log("LOADED");
-      // console.log(`Current Limit: ${this.pokemonData.limit}`);
+      this.is_loading = false;
+      console.log("DONE!");
     }
   },
   computed: {
@@ -133,6 +140,12 @@ export default {
         return this.pokemonData.info.filter(byName => {
           return byName.pokemon_name.match(this.pokemonData.pokemonSearch);
         });
+      } else if (this.currFilter != "normal") {
+        let { info } = this.pokemonData.info;
+        return this.pokemonData.info.filter(n => {
+          return n.types.some(x => x == this.currFilter);
+        });
+        return this.pokemonData.info;
       } else {
         return this.pokemonData.info;
       }
@@ -158,19 +171,30 @@ export default {
         ])
         .then(
           axios.spread((dataRes, speciesRes, evoRes) => {
+            let typeHolder = dataRes.data.types.map(gotoType => gotoType.type);
+            let pokeIntro = speciesRes.data.flavor_text_entries.filter(n => {
+              return n.language.name.match("en");
+            });
             this.pokemonData.info.push({
               id: dataRes.data.id,
               pokemon_name: dataRes.data.name,
+              types: typeHolder.map(getType => getType.name),
               species: speciesRes.data.genera[2].genus,
               habitat: speciesRes.data.habitat.name,
               color: speciesRes.data.color.name,
-              intro: speciesRes.data.flavor_text_entries,
+              intro: pokeIntro[0],
               pokemon_stats: dataRes.data.stats,
               evolution_chain: evoRes.data.chain.evolves_to[0]
             });
+            // console.log(
+            //   this.pokemonData.info.map(goType =>
+            //     goType.types.map(getType => getType.name)
+            //   )
+            // );
           })
         )
         .then(async () => {
+          let { info } = this.pokemonData;
           this.pokemonData.data_loaded = true;
           this.pokemonData.stats_loaded = true;
         });
@@ -225,6 +249,11 @@ export default {
   background: #cd5241;
   color: white;
   border-radius: 10px;
+
+  &.btn-disabled {
+    background: #7a6865;
+    cursor: not-allowed;
+  }
 }
 
 @media screen and (max-width: 425px) {
