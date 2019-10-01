@@ -7,16 +7,18 @@
         v-if="pokemonData.data_loaded && pokemonData.stats_loaded"
       />
     </div>
-    <ul class="pokemon__container" v-if="pokemonData.data_loaded && pokemonData.stats_loaded">
-      <Pokemon
-        v-for="(pokemon, i) in filterPokemon"
-        :key="i"
-        v-bind:pokemonData="pokemon"
-        v-bind:pokemonStatsLabel="pokemonData.stats_label"
-        @click.native="processPokemonInfo(pokemon.id)"
-        v-bind:pokeId="pokemon.id"
-      />
-    </ul>
+    <transition>
+      <ul class="pokemon__container" v-if="pokemonData.data_loaded && pokemonData.stats_loaded">
+        <Pokemon
+          v-for="(pokemon, i) in filterPokemon"
+          :key="i"
+          v-bind:pokemonData="pokemon"
+          v-bind:pokemonStatsLabel="pokemonData.stats_label"
+          @click.native="processPokemonInfo(pokemon.id)"
+          v-bind:pokeId="pokemon.id"
+        />
+      </ul>
+    </transition>
     <div v-if="modalOpened && pokemonData.data_loaded && misc_id">
       <PokemonSingle
         v-bind:isOpen="modalOpened"
@@ -203,6 +205,31 @@ export default {
 };
 </script>
 <style lang="scss">
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.v-enter-active {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.v-leave-active {
+  animation: fadeOut 0.3s ease forwards;
+}
 .home {
   width: 100%;
   max-width: 1200px;

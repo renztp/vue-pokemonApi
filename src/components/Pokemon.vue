@@ -1,30 +1,32 @@
 <template>
-  <div class="pokemon__item">
-    <!-- {{ pokeId }} -->
-    <span v-if="(pokemonData.id) < 10" class="pokemon__item__number">#00{{pokemonData.id}}</span>
-    <span
-      v-if="(pokemonData.id) >= 10 && (pokemonData.id) <= 99"
-      class="pokemon__item__number"
-    >#0{{pokemonData.id}}</span>
-    <span v-if="(pokemonData.id) > 99">#{{pokemonData.id}}</span>
-    <div class="pokemon__item__image">
-      <img
-        v-bind:src="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + (pokemonData.id) + '.png'"
-      />
-      <p>{{ pokemonData.pokemon_name }}</p>
-      <span>{{ pokemonData.species }}</span>
+  <transition>
+    <div class="pokemon__item">
+      <!-- {{ pokeId }} -->
+      <span v-if="(pokemonData.id) < 10" class="pokemon__item__number">#00{{pokemonData.id}}</span>
+      <span
+        v-if="(pokemonData.id) >= 10 && (pokemonData.id) <= 99"
+        class="pokemon__item__number"
+      >#0{{pokemonData.id}}</span>
+      <span v-if="(pokemonData.id) > 99">#{{pokemonData.id}}</span>
+      <div class="pokemon__item__image">
+        <img
+          v-bind:src="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + (pokemonData.id) + '.png'"
+        />
+        <p>{{ pokemonData.pokemon_name }}</p>
+        <span>{{ pokemonData.species }}</span>
+      </div>
+      <ul class="pokemon__item__stats">
+        <li v-for="(stats, _id) in pokemonData.pokemon_stats" :key="_id">
+          <span class="pokemon__item__stats__label">{{ pokemonStatsLabel[_id] }}</span>
+          <span class="pokemon__item__stats__bar">
+            <span v-if="stats.base_stat < 100" v-bind:style="{ width: stats.base_stat + '%'}"></span>
+            <span v-else v-bind:style="{ width: '100%'}"></span>
+          </span>
+          <span class="pokemon__item__stats__stat">{{ stats.base_stat }}</span>
+        </li>
+      </ul>
     </div>
-    <ul class="pokemon__item__stats">
-      <li v-for="(stats, _id) in pokemonData.pokemon_stats" :key="_id">
-        <span class="pokemon__item__stats__label">{{ pokemonStatsLabel[_id] }}</span>
-        <span class="pokemon__item__stats__bar">
-          <span v-if="stats.base_stat < 100" v-bind:style="{ width: stats.base_stat + '%'}"></span>
-          <span v-else v-bind:style="{ width: '100%'}"></span>
-        </span>
-        <span class="pokemon__item__stats__stat">{{ stats.base_stat }}</span>
-      </li>
-    </ul>
-  </div>
+  </transition>
 </template>
 
 <script>

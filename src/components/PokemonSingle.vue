@@ -1,22 +1,24 @@
 <template>
-  <div
-    class="pokemon-modal"
-    v-if="pokemonId"
-    v-bind:style="{ background: pokemonInfo.info[pokemonId-1].color }"
-  >
+  <div class="pokemon-modal" v-if="pokemonId" v-bind:style="{ background: pokeColor }">
     <img class="pokemon-modal__pokeball" src="@/assets/pokeball.png" alt />
     <img class="pokemon-modal__close" v-on:click="toggleClose()" src="@/assets/close.png" />
     <div class="pokemon-modal__base-info">
       <div class="base-info__ident">
-        <img
+        <!-- <img
           v-bind:src="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + (pokemonId) + '.png'"
-        />
-        <p>{{ pokemonInfo.info[pokemonId-1].pokemon_name }}</p>
-        <span>{{ pokemonInfo.info[pokemonId-1].species }}</span>
+        />-->
+        <a v-bind:href="'http://pokemondb.net/pokedex/' + pokeName" target="_blank">
+          <img
+            v-bind:src="'https://img.pokemondb.net/sprites/black-white/anim/normal/' + pokeName + '.gif'"
+            alt
+          />
+        </a>
+        <p>{{ pokeName }}</p>
+        <span>{{ pokeType }}</span>
       </div>
       <div class="base-info__intro">
         <h4>Intro</h4>
-        <p>{{ pokemonInfo.info[pokemonId-1].intro.flavor_text }}</p>
+        <p>{{ pokeBio }}</p>
       </div>
       <div v-if="dataCollection" class="base-info__stats">
         <div class="base-info__stats-container">
@@ -71,6 +73,18 @@ export default {
       return this.pokemonInfo.info[this.pokemonId - 1].pokemon_stats.map(
         x => x.base_stat
       );
+    },
+    pokeName: function() {
+      return this.pokemonInfo.info[this.pokemonId - 1].pokemon_name;
+    },
+    pokeType: function() {
+      return this.pokemonInfo.info[this.pokemonId - 1].species;
+    },
+    pokeBio: function() {
+      return this.pokemonInfo.info[this.pokemonId - 1].intro.flavor_text;
+    },
+    pokeColor: function() {
+      return this.pokemonInfo.info[this.pokemonId - 1].color;
     }
   },
   methods: {
@@ -181,10 +195,13 @@ export default {
         box-shadow: 0px -1px 3px #6f3333;
 
         img {
-          flex: 0 100%;
-          height: 96px;
-          width: 100%;
-          max-width: 96px;
+          // flex: 0 100%;
+          margin-bottom: 10px;
+          height: auto;
+          width: auto;
+          // height: 96px;
+          // width: 100%;
+          // max-width: 96px;
         }
 
         p {
