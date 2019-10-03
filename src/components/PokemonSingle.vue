@@ -1,45 +1,56 @@
 <template>
-  <div class="pokemon-modal" v-if="pokemonId" v-bind:style="{ background: pokeColor }">
-    <img class="pokemon-modal__pokeball" src="@/assets/pokeball.png" alt />
-    <img class="pokemon-modal__close" v-on:click="toggleClose()" src="@/assets/close.png" />
-    <div class="pokemon-modal__base-info">
-      <div class="base-info__ident">
-        <!-- <img
-          v-bind:src="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + (pokemonId) + '.png'"
-        />-->
-        <a v-bind:href="'http://pokemondb.net/pokedex/' + pokeName" target="_blank">
-          <img
-            v-bind:src="'https://img.pokemondb.net/sprites/black-white/anim/normal/' + pokeName + '.gif'"
-            alt
-          />
-        </a>
-        <p>{{ pokeName }}</p>
-        <span>{{ pokeType }}</span>
+  <div class="pokemon-modal" v-if="pokemonId">
+    <div class="pokemon-modal__wrapper01">
+      <!-- POKEMON NAME AND SPRITE -->
+      <button class="pokemon-modal__close" v-on:click="toggleClose()">< Pokemons</button>
+      <div class="pokemon-modal__info01" v-bind:style="pokeColor">
+        <div class="pokemon-modal__name">
+          <span class="pokemon-modal__name-id">{{ pokeId }}</span>
+          <p class="pokemon-modal__name-name">{{ pokeName }}</p>
+          <span class="pokemon-modal__name-type">{{ pokeType }}</span>
+        </div>
+        <div class="pokemon-modal__sprites">
+          <a v-bind:href="'http://pokemondb.net/pokedex/' + pokeName" target="_blank">
+            <img
+              v-bind:src="'https://img.pokemondb.net/sprites/black-white/anim/normal/' + pokeName + '.gif'"
+              alt
+            />
+          </a>
+        </div>
       </div>
-      <div class="base-info__intro">
+      <!-- POKERMON BIO -->
+      <div class="pokemon-modal__info02">
         <h4>Intro</h4>
         <p>{{ pokeBio }}</p>
       </div>
-      <div v-if="dataCollection" class="base-info__stats">
-        <div class="base-info__stats-container">
-          <RadarChart :chart-data="dataCollection" :options="chartOptions" />
+      <div class="pokemon-modal__info03">
+        <h4>Evolution Chain</h4>
+        <div class="pokemon-modal__chain">
+          <div v-for="(evo, i) in evolution" :key="i" class="pokemon-modal__chain-item">
+            <a v-bind:href="'http://pokemondb.net/pokedex/' + evo.species_name" target="_blank">
+              <img
+                v-bind:src="'https://img.pokemondb.net/sprites/black-white/anim/normal/' + evo.species_name + '.gif'"
+                alt
+              />
+            </a>
+            <p>{{ evo.species_name }}</p>
+          </div>
         </div>
       </div>
     </div>
-    <!-- <ul>
-      <li
-        v-for="pokeStats in pokemonInfo.info[pokemonId-1].pokemon_stats"
-        :key="pokeStats.id"
-      >{{ pokeStats.base_stat }}</li>
-    </ul>-->
-    <!-- <div class v-if="dataCollection">
-      <RadarChart :chart-data="dataCollection" :options="chartOptions" />
-    </div>-->
+    <div class="pokemon-modal__wrapper02">
+      <div class="pokemon-modal__info04">
+        <h4>Basic Info</h4>
+        <p>{{ pokeHeight }}</p>
+      </div>
+    </div>
   </div>
 </template>
 
+
 <script>
 import RadarChart from "@/components/RadarChart.js";
+import axios from "axios";
 
 export default {
   name: "PokemonSingle",
@@ -49,12 +60,15 @@ export default {
   props: {
     isOpen: Boolean,
     pokemonId: Number,
-    pokemonInfo: Object
+    pokemonInfo: Object,
+    pokemonEvoData: Array
   },
   data() {
     return {
       dataCollection: null,
-      chartOptions: null
+      chartOptions: null,
+      evolution: [],
+      currPokeInfo: this.pokemonInfo.info[this.pokemonId - 1]
     };
   },
   computed: {
@@ -65,26 +79,58 @@ export default {
       return this.pokemonInfo.info.pokemon_stats;
     },
     filterIntro: function() {
-      return this.pokemonInfo.info[this.pokemonId - 1].intro.filter(bylang => {
+      return this.currPokeInfo.intro.filter(bylang => {
         return bylang.language.name.match("en");
       });
     },
     arrayify: function() {
-      return this.pokemonInfo.info[this.pokemonId - 1].pokemon_stats.map(
-        x => x.base_stat
-      );
+      return this.currPokeInfo.pokemon_stats.map(x => x.base_stat);
     },
     pokeName: function() {
-      return this.pokemonInfo.info[this.pokemonId - 1].pokemon_name;
+      return this.currPokeInfo.pokemon_name;
     },
     pokeType: function() {
-      return this.pokemonInfo.info[this.pokemonId - 1].species;
+      return this.currPokeInfo.species;
     },
     pokeBio: function() {
-      return this.pokemonInfo.info[this.pokemonId - 1].intro.flavor_text;
+      return this.currPokeInfo.intro.flavor_text;
+    },
+    pokeEvoId: function() {
+      return this.currPokeInfo.evolution_id;
     },
     pokeColor: function() {
-      return this.pokemonInfo.info[this.pokemonId - 1].color;
+      let theColor = this.currPokeInfo.color;
+      // return this.pokemonInfo.info[this.pokemonId - 1].color;
+      if (theColor == "yellow") {
+        return { background: theColor, color: "black" };
+      } else if (theColor == "white") {
+        return { background: "rgb(187, 187, 255)", color: "black" };
+      } else {
+        return { background: theColor, color: "white" };
+      }
+    },
+    pokeHeight: function() {
+      return (
+        Math.round(
+          (this.currPokeInfo.pokemon_height * 0.328084 + 0.0001) * 100
+        ) / 100
+      );
+    },
+    pokeWeight: function() {
+      return (
+        Math.round(
+          (this.currPokeInfo.pokemon_weight * 0.220462 + 0.0001) * 100
+        ) / 100
+      );
+    },
+    pokeId: function() {
+      if (this.pokemonId < 10) {
+        return `#00${this.pokemonId}`;
+      } else if (this.pokemonId >= 10 && this.pokemonId <= 99) {
+        return `#0${this.pokemonId}`;
+      } else if (this.pokemonId > 99) {
+        return `#${this.pokemonId}`;
+      }
     }
   },
   methods: {
@@ -130,148 +176,145 @@ export default {
   },
   mounted: function() {
     this.fillData();
+    axios.get(this.pokeEvoId).then(res => {
+      console.log(res.data.chain);
+      let evoData = res.data.chain;
+      do {
+        var evoDetails = evoData["evolution_details"][0];
+        this.evolution.push({
+          species_name: evoData.species.name,
+          min_level: !evoDetails ? 1 : evoDetails.min_level,
+          trigger_name: !evoDetails ? null : evoDetails.trigger.name,
+          item: !evoDetails ? null : evoDetails.item
+        });
+        evoData = evoData["evolves_to"][0];
+      } while (!!evoData && evoData.hasOwnProperty("evolves_to"));
+    });
   }
 };
 </script>
 
-<style lang="scss" scoped>
+
+<style lang="scss">
 .pokemon-modal {
   position: fixed;
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  box-sizing: border-box;
   top: 48%;
   left: 50%;
   transform: translate(-50%, -50%);
-  height: 670px;
-  width: 426px;
+  // height: 570px;
+  width: 662px;
   background: white;
   z-index: 9;
-  display: flex;
-  flex-wrap: wrap;
-  color: #000;
   transform: translate(-50%, -50.1%);
-  padding-top: 90px;
+  border-radius: 15px;
 
-  &__pokeball {
-    position: absolute;
-    top: 30px;
-    left: 80px;
-    transform: rotate(30deg);
-    z-index: 4;
-    width: 100%;
-    height: auto;
-    width: 80px;
-    opacity: 0.5;
+  h4 {
+    margin: 0 0 10px;
+  }
+
+  &__wrapper01 {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    flex: 0 49%;
   }
 
   &__close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 16px;
+    height: 20px;
+    display: inline;
+    background: transparent;
+    border: 0;
+    font-size: 12px;
     cursor: pointer;
   }
 
-  &__base-info {
-    position: relative;
-    z-index: 9;
+  &__info01 {
     display: flex;
-    flex-wrap: wrap;
-    flex: 0 100%;
+    flex: 100%;
+    box-sizing: border-box;
     justify-content: space-between;
-    align-items: flex-start;
-    align-content: flex-start;
+    align-items: center;
+    padding: 25px 15px;
+    margin-bottom: 30px;
+    border-radius: 15px;
+    color: white;
+    letter-spacing: 0.03em;
+    font-weight: 500;
+  }
 
-    .base-info {
-      &__ident {
-        display: flex;
-        flex: 0 100%;
-        align-content: flex-start;
-        flex-wrap: wrap;
-        text-align: center;
-        justify-content: center;
-        padding: 10px 0 25px;
-        background: white;
-        border-top-right-radius: 10px;
-        border-top-left-radius: 10px;
-        box-shadow: 0px -1px 3px #6f3333;
+  &__name {
+    text-transform: capitalize;
+    flex: 0 50%;
+    letter-spacing: 0.03em;
 
-        img {
-          // flex: 0 100%;
-          margin-bottom: 10px;
-          height: auto;
-          width: auto;
-          // height: 96px;
-          // width: 100%;
-          // max-width: 96px;
-        }
+    &-id {
+      font-size: 12px;
+    }
 
-        p {
-          margin: 0;
-          font-family: "Roboto";
-          font-weight: 600;
-          text-transform: capitalize;
-          flex: 0 100%;
-          margin-bottom: 3px;
-        }
+    &-name {
+      margin: 0;
+      font-size: 22px;
+      margin: 0;
+    }
 
-        span {
-          font-size: 12px;
-          font-weight: 700;
-          flex: 0 100%;
-          opacity: 0.6;
-        }
-      }
-
-      &__stats {
-        background: #fff;
-        flex: 0 100%;
-        justify-content: center;
-        align-items: center;
-
-        &-container {
-          position: relative;
-          width: 230px;
-          margin: 0 auto;
-
-          canvas {
-            height: 290px !important;
-          }
-        }
-      }
-
-      &__intro {
-        display: flex;
-        flex: 0 100%;
-        padding: 10px 20px 25px;
-        flex-wrap: wrap;
-        background: white;
-        align-content: flex-start;
-        align-items: flex-start;
-
-        h4 {
-          margin: 0;
-          padding: 0;
-        }
-      }
+    &-type {
+      font-size: 13px;
+      opacity: 0.8;
     }
   }
-}
 
-@media screen and (max-width: 425px) {
-  .pokemon-modal {
+  &__sprites {
+    flex: 0 50%;
+    text-align: center;
+  }
+
+  &__info02 {
     width: 100%;
-    height: 100%;
-    padding-top: 0;
+    margin-bottom: 20px;
+    letter-spacing: 0.03em;
+    line-height: 1.3;
 
-    &__close {
-      top: 25px;
-      right: 10px;
-      z-index: 999;
+    p {
+      margin: 0;
+      font-size: 14px;
     }
+  }
 
-    &__base-info {
-      height: 110%;
-      overflow-y: scroll;
+  &__chain {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  &__chain-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: flex-start;
+    align-items: center;
+    border-radius: 15px;
+    padding: 5px 15px;
+    min-height: 90px;
+    margin-bottom: 10px;
+    flex: 1;
+    a {
+      flex: 40%;
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
     }
+    p {
+      font-size: 16px;
+      text-transform: capitalize;
+    }
+  }
+
+  &__wrapper02 {
+    display: flex;
+    flex: 0 49%;
   }
 }
 </style>

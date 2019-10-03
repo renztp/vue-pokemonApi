@@ -58,7 +58,7 @@ export default {
         pokemonSearch: "",
         info: [],
         stats_label: ["SPD", "S.DEF", "S.ATK", "DEF", "ATK", "HP"],
-        limit: 12,
+        limit: 62,
         data_loaded: false,
         stats_loaded: false
       },
@@ -67,6 +67,11 @@ export default {
     };
   },
   methods: {
+    returnEvo: function(name) {
+      return this.pokemonChain.filter(arr => {
+        return arr.pokeName.match(name);
+      });
+    },
     emitSearch: function(updatedSearch) {
       this.pokemonData.pokemonSearch = updatedSearch.toLowerCase();
     },
@@ -100,10 +105,6 @@ export default {
             await axios.get(
               `https://pokeapi.co/api/v2/pokemon-species/${callIter}`,
               config
-            ),
-            await axios.get(
-              `https://pokeapi.co/api/v2/evolution-chain/${callIter}`,
-              config
             )
           ])
           .then(
@@ -111,9 +112,11 @@ export default {
               let typeHolder = dataRes.data.types.map(
                 gotoType => gotoType.type
               );
-              let pokeIntro = speciesRes.data.flavor_text_entries.filter(n => {
-                return n.language.name.match("en");
-              });
+              let pokeIntro = speciesRes.data.flavor_text_entries.filter(
+                descrip => {
+                  return descrip.language.name.match("en");
+                }
+              );
               this.pokemonData.info.push({
                 id: dataRes.data.id,
                 pokemon_name: dataRes.data.name,
@@ -123,7 +126,7 @@ export default {
                 color: speciesRes.data.color.name,
                 intro: pokeIntro[0],
                 pokemon_stats: dataRes.data.stats,
-                evolution_chain: evoRes.data.chain.evolves_to[0]
+                evolution_id: speciesRes.data.evolution_chain.url
               });
             })
           );
@@ -168,35 +171,32 @@ export default {
           await axios.get(
             `https://pokeapi.co/api/v2/pokemon-species/${iter}`,
             config
-          ),
-          axios.get(`https://pokeapi.co/api/v2/evolution-chain/${iter}`, config)
+          )
         ])
         .then(
           axios.spread((dataRes, speciesRes, evoRes) => {
-            let typeHolder = dataRes.data.types.map(gotoType => gotoType.type);
-            let pokeIntro = speciesRes.data.flavor_text_entries.filter(n => {
-              return n.language.name.match("en");
-            });
+            let typeHolder = dataRes.data.types.map(gotoType => gotoType.type),
+              pokeIntro = speciesRes.data.flavor_text_entries.filter(
+                descrip => {
+                  return descrip.language.name.match("en");
+                }
+              );
             this.pokemonData.info.push({
               id: dataRes.data.id,
               pokemon_name: dataRes.data.name,
+              pokemon_height: dataRes.data.height,
+              pokemon_weight: dataRes.data.weight,
               types: typeHolder.map(getType => getType.name),
               species: speciesRes.data.genera[2].genus,
               habitat: speciesRes.data.habitat.name,
               color: speciesRes.data.color.name,
               intro: pokeIntro[0],
               pokemon_stats: dataRes.data.stats,
-              evolution_chain: evoRes.data.chain.evolves_to[0]
+              evolution_id: speciesRes.data.evolution_chain.url
             });
-            // console.log(
-            //   this.pokemonData.info.map(goType =>
-            //     goType.types.map(getType => getType.name)
-            //   )
-            // );
           })
         )
         .then(async () => {
-          let { info } = this.pokemonData;
           this.pokemonData.data_loaded = true;
           this.pokemonData.stats_loaded = true;
         });
