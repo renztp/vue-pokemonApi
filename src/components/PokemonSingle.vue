@@ -1,8 +1,8 @@
 <template>
   <div class="pokemon-modal" v-if="pokemonId">
+    <button class="pokemon-modal__close" v-on:click="toggleClose()">< Pokemons</button>
     <div class="pokemon-modal__wrapper01">
       <!-- POKEMON NAME AND SPRITE -->
-      <button class="pokemon-modal__close" v-on:click="toggleClose()">< Pokemons</button>
       <div class="pokemon-modal__info01" v-bind:style="pokeColor">
         <div class="pokemon-modal__name">
           <span class="pokemon-modal__name-id">{{ pokeId }}</span>
@@ -41,7 +41,26 @@
     <div class="pokemon-modal__wrapper02">
       <div class="pokemon-modal__info04">
         <h4>Basic Info</h4>
-        <p>{{ pokeHeight }}</p>
+        <div class="pokemon-modal__basic-item">
+          <span>Height</span>
+          <p>{{ pokeHeight }}ft</p>
+        </div>
+        <div class="pokemon-modal__basic-item">
+          <span>Element</span>
+          <ul>
+            <li v-for="(elm, elmKey) in pokeElement" :key="elmKey">{{ elm }}</li>
+          </ul>
+        </div>
+        <div class="pokemon-modal__basic-item">
+          <span>Weight</span>
+          <p>{{ pokeWeight }}kg</p>
+        </div>
+      </div>
+      <div class="pokemon-modal__info05">
+        <h4>Stats</h4>
+        <div class="pokemon-modal__chart">
+          <RadarChart :chart-data="dataCollection" :options="chartOptions" />
+        </div>
       </div>
     </div>
   </div>
@@ -97,6 +116,9 @@ export default {
     },
     pokeEvoId: function() {
       return this.currPokeInfo.evolution_id;
+    },
+    pokeElement: function() {
+      return this.currPokeInfo.types;
     },
     pokeColor: function() {
       let theColor = this.currPokeInfo.color;
@@ -163,14 +185,14 @@ export default {
           text: ""
         },
         responsive: true,
-        maintainAspectRatio: false,
-        aspectRatio: 5,
-        pointDot: false,
-        showTooltips: false,
-        scaleOverride: false,
-        scaleSteps: 1,
-        scaleStepWidth: 0,
-        scaleStartValue: 0
+        maintainAspectRatio: false
+        // aspectRatio: 2
+        // pointDot: false,
+        // showTooltips: false,
+        // scaleOverride: false,
+        // scaleSteps: 1,
+        // scaleStepWidth: 0,
+        // scaleStartValue: 0
       };
     }
   },
@@ -200,7 +222,7 @@ export default {
   position: fixed;
   display: flex;
   justify-content: space-between;
-  padding: 15px;
+  padding: 30px 15px 30px;
   box-sizing: border-box;
   top: 48%;
   left: 50%;
@@ -211,6 +233,7 @@ export default {
   z-index: 9;
   transform: translate(-50%, -50.1%);
   border-radius: 15px;
+  color: #000;
 
   h4 {
     margin: 0 0 10px;
@@ -224,6 +247,9 @@ export default {
   }
 
   &__close {
+    position: absolute;
+    top: 7px;
+    left: 10px;
     height: 20px;
     display: inline;
     background: transparent;
@@ -314,7 +340,89 @@ export default {
 
   &__wrapper02 {
     display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
     flex: 0 49%;
+  }
+
+  &__info04 {
+    display: flex;
+    width: 100%;
+    margin-bottom: 30px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-content: flex-start;
+
+    h4 {
+      flex: 0 100%;
+    }
+  }
+
+  &__basic-item {
+    position: relative;
+    flex: 0 32.33%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px;
+    background: #ccc;
+
+    span {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: #666;
+    }
+
+    p {
+      font-size: 16px;
+      color: #000;
+    }
+
+    ul {
+      padding: 0;
+      margin: 0;
+
+      li {
+        list-style: none;
+        text-align: center;
+        font-size: 16px;
+        text-transform: capitalize;
+        color: #000;
+      }
+    }
+  }
+
+  &__info05 {
+    width: 100%;
+  }
+
+  &__chart {
+    width: 260px;
+    margin: -60px auto;
+  }
+}
+
+@media screen and (max-width: 425px) {
+  .pokemon-modal {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    flex-wrap: wrap;
+    transform: unset;
+    top: 0;
+    left: unset;
+    border-radius: 0;
+
+    &__wrapper01 {
+      flex: 0 100%;
+    }
+
+    &__wrapper02 {
+      flex: 0 100%;
+    }
   }
 }
 </style>
