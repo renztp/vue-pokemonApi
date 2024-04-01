@@ -4,7 +4,7 @@ A Simple Pokedex App using Pokemon API to fetch data.
 Technology Used:
 Vuejs, Axios.
 
-[DEMO](https://renzpulvira.github.io/vue-pokemonApi/)
+[DEMO](https://renztp.github.io/vue-pokemonApi/)
 
 ## Project setup
 ```
